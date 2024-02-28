@@ -1,0 +1,97 @@
+﻿@page "/Calculator"
+@rendermode InteractiveWebAssembly
+@using Shared
+@inject CalculatorService CalculatorService
+@inject CalcHistoryService CalcHistoryService
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
+
+<h3>Calculator</h3>
+
+
+<EditForm FormName="Demoform" Model="Input">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+
+                    <MudTextField T="double" Label="Enter Number" @bind-Value="Input.A"></MudTextField>
+                    <MudTextField T="double" Label="Enter Number" @bind-Value="Input.B"></MudTextField>
+                </MudCardContent>
+
+
+                <MudCardActions class="">
+
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick=Add>+</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick=Divide>/</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick=Subtract>-</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick=Multiply>*</MudButton>
+
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper class="pa-4 mud-height-full">
+                <MudList>
+                    @foreach (var equation in CalcHistoryService.GetAllEquations())
+                    {
+                        <MudListItem>@equation</MudListItem>
+                    }
+
+                </MudList>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+<div>
+    <p>@Result</p>
+</div>
+
+
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+@code {
+    public double Result { get; set; }
+
+    public Input Input
+    {
+        get;
+        set;
+    } = new();
+
+    private void Multiply()
+    {
+        Result = CalculatorService.Multiply(Input.A, Input.B);
+        CalcHistoryService.AddEquationToList(Input.A, Input.B, Result, "*", DateTime.Now.TimeOfDay);
+
+    }
+
+    private void Divide()
+    {
+        Result = CalculatorService.Divide(Input.A, Input.B);
+        CalcHistoryService.AddEquationToList(Input.A, Input.B, Result, "/", DateTime.Now.TimeOfDay);
+
+    }
+
+    private void Add()
+    {
+        Result = CalculatorService.AddNumbers(Input.A, Input.B);
+        CalcHistoryService.AddEquationToList(Input.A, Input.B, Result, "+", DateTime.Now.TimeOfDay);
+
+    }
+
+    private void Subtract()
+    {
+        Result = CalculatorService.Subtract(Input.A, Input.B);
+        CalcHistoryService.AddEquationToList(Input.A, Input.B, Result, "-", DateTime.Now.TimeOfDay);
+    }
+
+    private void AddInputNumbers()
+    {
+        Result = Input.A + Input.B;
+    }
+
+}
